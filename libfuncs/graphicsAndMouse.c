@@ -3,33 +3,73 @@
 #include <string.h>
 #include <strings.h>
 
-void wpaint(WINDOW *win, char ch, short clr){
+#include<sys/types.h>
+#include<sys/stat.h>
+
+void wpaint(WINDOW *win, const chtype ch, short clr){
         wattron(win,COLOR_PAIR(clr));
 
         for(int i=0;i<getmaxy(win);i++)
                 for(int j=0;j<getmaxx(win);j++)
-                        mvwprintw(win,i,j,"%c",ch);
+                        mvwaddch(win,i,j,ch);
 
         wattroff(win, COLOR_PAIR(clr));
 }
 
 int chprint(WINDOW *win, char *fname){
-	FILE *fp=fopen(fname,"r+");
-	wmove(win,0,0);
-	if(fp==NULL)
-		return -1;
-	while(!feof(fp)){
-		wprintw(win,"%c",fgetc(fp));
-	}
-	fclose(fp);
+	struct stat statbuf;
+	char buff;
 
+	int y=0,x=0;
+
+	if(stat(fname,&statbuf)!=-1){
+		FILE *fp=fopen(fname,"r+");
+		wmove(win,0,0);
+
+		while(!feof(fp)){
+			buff=fgetc(fp);
+			switch(buff){
+				case '\n':
+					y++;
+					x=0;
+					break;
+				case '\t':
+					x+=8;
+					break;
+				default:
+					x++;
+					break;
+			}
+			mvwprintw(win,y,x,"%c",buff);
+		}
+		fclose(fp);
+	}else{
+		return -1;
+	}
 	return 0;
+}
+void wredrawbg(WINDOW *win,short col){
+	int t=0;
+
+	wattron(win,COLOR_PAIR(col));
+	for(int i=0;i<getmaxy(win);i++){
+		for(int j=0;j<getmaxx(win);j++){
+			t=mvwinch(win,i,j);
+			waddch(win,t);
+		}
+	}
+	wattroff(win,COLOR_PAIR(col));
+}
+void woutline(WINDOW *win,short col, const chtype ch1, const chtype ch2){
+	wattron(win,COLOR_PAIR(col));
+	box(win,ch1,ch2);
+	wattroff(win,COLOR_PAIR(col));
 }
 
 int touch(int y, int x, int y1, int x1, MEVENT evnt){
         return ((evnt.y > y && evnt.y < y1) && (evnt.x > x && evnt. x < x1));
 }
-// int mtouchwin(WINDOW *win, MEVENT evnt){
-//         return touch(getbegy(win),getbegx(win),getmaxy(win),getmaxx(win),evnt);
-// }
-
+int wistouching(WINDOW *win, int y, int x){
+	int t=mvwinch(win,y,x);
+	return (t == '+') || (t == '|') || (t=='_') || (t=='-') || (t=='#') || (t=='/') || (t=='\\');
+}
