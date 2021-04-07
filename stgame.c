@@ -102,7 +102,7 @@ re_enter:
 
 		sprintf(game,"%s/%s",gameDir,exe);
 		sprintf(exec,"%s.c",game);
-		sprintf(comp,"gcc %s %s/libfuncs/*.c -lncurses -I%s/libs -o %s",exec,gameDev,gameDev,game);
+		sprintf(comp,"gcc %s %s/libfuncs/*.c -lncurses -lpthread -lcurl -I%s/libs -o %s",exec,gameDev,gameDev,game);
 
 		wattroff(chfile,COLOR_PAIR(2));
 		curs_set(0);

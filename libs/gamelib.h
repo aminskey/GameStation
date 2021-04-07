@@ -10,9 +10,9 @@ int y;
 int x;
 
 char __str[200];
-char home[]="/home/amin";
-char gameDir[]="/home/amin/games";
-char gameDev[]="/home/amin/cworkspace/gameStation";
+char home[]="/home/lukeskywalker";
+char gameDir[]="/home/lukeskywalker/games";
+char gameDev[]="/home/lukeskywalker/cworkspace/gameStation";
 char website[]="https://github.com/aminskey/cworkspace/";
 char *file;
 
